@@ -5,10 +5,11 @@ using Dan.Common;
 using Dan.Common.Enums;
 using Dan.Common.Interfaces;
 using Dan.Common.Models;
+using Dan.Plugin.Nav.Config;
 using Dan.Plugin.Nav.Models;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
-using Newtonsoft.Json.Schema.Generation;
+using NJsonSchema;
 
 namespace Dan.Plugin.Nav;
 
@@ -17,67 +18,8 @@ namespace Dan.Plugin.Nav;
 /// </summary>
 public class Metadata : IEvidenceSourceMetadata
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
-    public List<EvidenceCode> GetEvidenceCodes()
-    {
-        JSchemaGenerator generator = new JSchemaGenerator();
+    private readonly List<string> _belongsToAltinnStudioApps = [PluginConstants.AltinnStudioAppsServiceContext];
 
-        return new List<EvidenceCode>()
-        {
-            new()
-            {
-                EvidenceCodeName = global::Dan.Plugin.Nav.Plugin.SimpleDatasetName,
-                EvidenceSource = global::Dan.Plugin.Nav.Plugin.SourceName,
-                Values = new List<EvidenceValue>()
-                {
-                    new()
-                    {
-                        EvidenceValueName = "field1",
-                        ValueType = EvidenceValueType.String
-                    },
-                    new()
-                    {
-                        EvidenceValueName = "field2",
-                        ValueType = EvidenceValueType.String
-                    }
-                }
-            },
-            new()
-            {
-                EvidenceCodeName = global::Dan.Plugin.Nav.Plugin.RichDatasetName,
-                EvidenceSource = global::Dan.Plugin.Nav.Plugin.SourceName,
-                Values = new List<EvidenceValue>()
-                {
-                    new()
-                    {
-                        // Convention for rich datasets with a single JSON model is to use the value name "default"
-                        EvidenceValueName = "default",
-                        ValueType = EvidenceValueType.JsonSchema,
-                        JsonSchemaDefintion =  generator.Generate(typeof(ExampleModel)).ToString()
-                    }
-                },
-                AuthorizationRequirements = new List<Requirement>
-                {
-                    new MaskinportenScopeRequirement
-                    {
-                        RequiredScopes = new List<string> { "altinn:dataaltinnno/somescope" }
-                    }
-                }
-            }
-        };
-    }
-
-
-    /// <summary>
-    /// This function must be defined in all DAN plugins, and is used by core to enumerate the available datasets across all plugins.
-    /// Normally this should not be changed.
-    /// </summary>
-    /// <param name="req"></param>
-    /// <param name="context"></param>
-    /// <returns></returns>
     [Function(Constants.EvidenceSourceMetadataFunctionName)]
     public async Task<HttpResponseData> GetMetadataAsync(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequestData req,
@@ -88,4 +30,30 @@ public class Metadata : IEvidenceSourceMetadata
         return response;
     }
 
+    public List<EvidenceCode> GetEvidenceCodes()
+    {
+        return
+        [
+            new EvidenceCode
+            {
+                // TODO: Determine suitable name
+                EvidenceCodeName = PluginConstants.EmploymentHistory,
+                EvidenceSource = PluginConstants.SourceName,
+                ServiceContext = PluginConstants.AltinnStudioAppsServiceContext,
+                BelongsToServiceContexts = _belongsToAltinnStudioApps,
+                Values =
+                [
+                    // TODO: Determine type
+                    new EvidenceValue
+                    {
+                        EvidenceValueName = "default",
+                        ValueType = EvidenceValueType.JsonSchema,
+                        JsonSchemaDefintion = JsonSchema
+                            .FromType<Dictionary<int, string>>()
+                            .ToJson(Newtonsoft.Json.Formatting.Indented)
+                    }
+                ]
+            }
+        ];
+    }
 }
