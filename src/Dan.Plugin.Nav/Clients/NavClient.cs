@@ -2,7 +2,6 @@
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
 using Dan.Common;
@@ -10,6 +9,7 @@ using Dan.Common.Exceptions;
 using Dan.Common.Models;
 using Dan.Plugin.Nav.Config;
 using Dan.Plugin.Nav.Models;
+using Dan.Plugin.Nav.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -18,41 +18,31 @@ namespace Dan.Plugin.Nav.Clients;
 
 public interface INavClient
 {
-    Task<NavEmployeeQueryResponse> GetAaInformation(EvidenceHarvesterRequest req);
+    Task<NavEmployeeQueryResponse> GetEmploymentHistory(EvidenceHarvesterRequest req);
 }
 
 public class NavClient(
     IHttpClientFactory clientFactory,
     IOptions<Settings> settings,
-    ILoggerFactory loggerFactory) : INavClient
+    ILoggerFactory loggerFactory,
+    IGraphQlRequestService graphQlRequestService) : INavClient
 {
     private readonly HttpClient _client = clientFactory.CreateClient(Constants.SafeHttpClient);
     private readonly Settings _settings = settings.Value;
     private readonly ILogger<NavClient> _logger = loggerFactory.CreateLogger<NavClient>();
 
-    public async Task<NavEmployeeQueryResponse> GetAaInformation(EvidenceHarvesterRequest req)
+    public async Task<NavEmployeeQueryResponse> GetEmploymentHistory(EvidenceHarvesterRequest req)
     {
         var baseUrl = _settings.NavUrl;
         const string path = "/aareg/v1/arbeidsforhold/graphql";
         var url = $"{baseUrl}{path}";
 
-        var requestBody = new NavEmployeeQueryRequest
-        {
-            Variables = new NavEmployeeQueryVariables
-            {
-                Variables = new NavEmployeeVariables
-                {
-                    Id = req.SubjectParty!.NorwegianSocialSecurityNumber,
-                    EmploymentTypes = ["ordinaertArbeidsforhold","maritimtArbeidsforhold"],
-                    Reporting = ["A_ORDNINGEN"],
-                    Status = ["AKTIV", "AVSLUTTET"],
-                    HistoricalDetails = false
-                }
-            }
-        };
+        var requestBody =
+            graphQlRequestService.CreateEmploymentHistoryRequest(req.SubjectParty!.NorwegianSocialSecurityNumber);
         var request = GetRequest(url, HttpMethod.Post, req.MPToken, requestBody);
 
         var response = await MakeRequest<NavEmployeeQueryResponse>(request);
+
         return response;
     }
 

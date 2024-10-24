@@ -18,16 +18,12 @@ using Microsoft.Extensions.Options;
 namespace Dan.Plugin.Nav;
 
 public class Plugin(
-    IHttpClientFactory httpClientFactory,
     ILoggerFactory loggerFactory,
-    IOptions<Settings> settings,
     INavClient navClient,
     IEmploymentHistoryMapper employmentHistoryMapper,
     IEvidenceSourceMetadata evidenceSourceMetadata)
 {
     private readonly ILogger _logger = loggerFactory.CreateLogger<Plugin>();
-    private readonly HttpClient _client = httpClientFactory.CreateClient(Constants.SafeHttpClient);
-    private readonly Settings _settings = settings.Value;
 
     [Function(PluginConstants.EmploymentHistory)]
     public async Task<HttpResponseData> GetEmploymentHistory(
@@ -61,8 +57,8 @@ public class Plugin(
                 "Request is missing ssn");
         }
 
-        var aaHistory = await navClient.GetAaInformation(evidenceHarvesterRequest);
-        var response = employmentHistoryMapper.Map(aaHistory);
+        var employmentHistory = await navClient.GetEmploymentHistory(evidenceHarvesterRequest);
+        var response = employmentHistoryMapper.Map(employmentHistory);
         var ecb = new EvidenceBuilder(evidenceSourceMetadata, PluginConstants.EmploymentHistory);
         ecb.AddEvidenceValue("default", response, PluginConstants.SourceName);
         return ecb.GetEvidenceValues();

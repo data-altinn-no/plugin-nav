@@ -36,20 +36,19 @@ public class Metadata : IEvidenceSourceMetadata
         [
             new EvidenceCode
             {
-                // TODO: Determine suitable name
                 EvidenceCodeName = PluginConstants.EmploymentHistory,
                 EvidenceSource = PluginConstants.SourceName,
                 ServiceContext = PluginConstants.AltinnStudioAppsServiceContext,
                 BelongsToServiceContexts = _belongsToAltinnStudioApps,
+                RequiredScopes = "nav:aareg/v1/arbeidsforhold",
                 Values =
                 [
-                    // TODO: Determine type
                     new EvidenceValue
                     {
                         EvidenceValueName = "default",
                         ValueType = EvidenceValueType.JsonSchema,
                         JsonSchemaDefintion = JsonSchema
-                            .FromType<Dictionary<int, string>>()
+                            .FromType<EmploymentHistory>()
                             .ToJson(Newtonsoft.Json.Formatting.Indented)
                     }
                 ]

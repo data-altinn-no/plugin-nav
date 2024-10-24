@@ -3,7 +3,7 @@ using Microsoft.Extensions.Hosting;
 using Dan.Common.Extensions;
 using Dan.Plugin.Nav.Clients;
 using Dan.Plugin.Nav.Mappers;
-using Dan.Plugin.Nav.Models;
+using Dan.Plugin.Nav.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 var host = new HostBuilder()
@@ -18,6 +18,7 @@ var host = new HostBuilder()
         // Add any additional services here
         services.AddTransient<INavClient, NavClient>();
         services.AddTransient<IEmploymentHistoryMapper, EmploymentHistoryMapper>();
+        services.AddTransient<IGraphQlRequestService, GraphQlRequestService>();
 
         // This makes IOption<Settings> available in the DI container.
         var configurationRoot = context.Configuration;
