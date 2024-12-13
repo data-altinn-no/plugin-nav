@@ -52,6 +52,25 @@ public class Metadata : IEvidenceSourceMetadata
                             .ToJson(Newtonsoft.Json.Formatting.Indented)
                     }
                 ]
+            },
+            new EvidenceCode
+            {
+                EvidenceCodeName = PluginConstants.Grunnbeloep,
+                EvidenceSource = PluginConstants.SourceName,
+                ServiceContext = PluginConstants.AltinnStudioAppsServiceContext,
+                BelongsToServiceContexts = _belongsToAltinnStudioApps,
+                Description = "Gjeldende grunnbeløp fra NAV",
+                Values =
+                [
+                    new EvidenceValue
+                    {
+                        EvidenceValueName = "default",
+                        ValueType = EvidenceValueType.JsonSchema,
+                        JsonSchemaDefintion = JsonSchema
+                            .FromType<Grunnbeloep>()
+                            .ToJson(Newtonsoft.Json.Formatting.Indented)
+                    }
+                ]
             }
         ];
     }

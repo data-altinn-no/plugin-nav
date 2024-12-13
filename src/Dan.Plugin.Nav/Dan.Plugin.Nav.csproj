@@ -5,6 +5,9 @@
     <OutputType>Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="local.settings.json" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="Dan.Common" Version="1.6.0" />
     <PackageReference Include="GraphQL.Client" Version="6.1.0" />
     <PackageReference Include="GraphQL.Client.Serializer.Newtonsoft" Version="6.1.0" />

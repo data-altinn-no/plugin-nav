@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -19,6 +19,7 @@ namespace Dan.Plugin.Nav.Clients;
 public interface INavClient
 {
     Task<NavEmployeeQueryResponse> GetEmploymentHistory(EvidenceHarvesterRequest req);
+    Task<Grunnbeloep> GetCurrentGAmount();
 }
 
 public class NavClient(
@@ -43,6 +44,16 @@ public class NavClient(
 
         var response = await MakeRequest<NavEmployeeQueryResponse>(request);
 
+        return response;
+    }
+
+    public async Task<Grunnbeloep> GetCurrentGAmount()
+    {
+        var baseUrl = _settings.NavUrlGrunnbeloep;
+        const string path = "grunnbeloep";
+        var url = $"{baseUrl}{path}";
+        var request = new HttpRequestMessage(HttpMethod.Get, url);
+        var response = await MakeRequest<Grunnbeloep>(request);
         return response;
     }
 

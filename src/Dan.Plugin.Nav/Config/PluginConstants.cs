@@ -1,4 +1,4 @@
-﻿namespace Dan.Plugin.Nav.Config;
+namespace Dan.Plugin.Nav.Config;
 
 public static class PluginConstants
 {
@@ -10,4 +10,6 @@ public static class PluginConstants
     public const string EmploymentHistory = "EmploymentHistory";
     public const string SourceName = "NAV";
     public const string AltinnStudioAppsServiceContext = "Altinn Studio-apps";
+
+    public const string Grunnbeloep = "Grunnbeloep";
 }

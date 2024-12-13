@@ -7,4 +7,6 @@ public class Settings
     public int SafeHttpClientTimeout { get; set; }
 
     public string NavUrl { get; set; }
+
+    public string NavUrlGrunnbeloep { get; set; }
 }
