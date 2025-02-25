@@ -13,7 +13,7 @@ public class EmploymentHistoryMapper : IEmploymentHistoryMapper
     {
         return new EmploymentHistory()
         {
-            EmploymentInfo = input.Data.EmploymentInfoResponse.EmploymentInfo
+            EmploymentInfo = input?.Data?.EmploymentInfoResponse?.EmploymentInfo
         };
     }
 }
