@@ -34,13 +34,11 @@ public class NavClient(
 
     public async Task<NavEmployeeQueryResponse> GetEmploymentHistory(EvidenceHarvesterRequest req)
     {
-        var baseUrl = _settings.NavUrl;
-        const string path = "/aareg/v1/arbeidsforhold/graphql";
-        var url = $"{baseUrl}{path}";
+        var baseUrl = _settings.NavUrl;    
 
         var requestBody =
             graphQlRequestService.CreateEmploymentHistoryRequest(req.SubjectParty!.NorwegianSocialSecurityNumber);
-        var request = GetRequest(url, HttpMethod.Post, req.MPToken, requestBody);
+        var request = GetRequest(baseUrl, HttpMethod.Post, req.MPToken, requestBody);
 
         var response = await MakeRequest<NavEmployeeQueryResponse>(request);
 
